@@ -596,7 +596,6 @@
 <body>
 
 <div class="progress" id="progress"></div>
-<div class="key-hint"><kbd>←</kbd> <kbd>→</kbd> navigieren</div>
 
 <div class="slides" id="slides">
 
@@ -1006,13 +1005,16 @@
 
 </div>
 
-<!-- Navigation -->
-<nav>
-  <img src="logo.png" alt="Logo" style="width:24px; height:24px; object-fit:contain; opacity:0.85; border-radius:50%;" onerror="this.style.display='none'">
-  <button class="nav-btn" id="prev" title="Zurück">&#8592;</button>
-  <div class="dots" id="dots"></div>
-  <button class="nav-btn" id="next" title="Vor">&#8594;</button>
-</nav>
+<!-- Unsichtbare Tap-Zonen links/rechts -->
+<div onclick="go(cur-1)" style="position:fixed;left:0;top:0;width:35%;height:100%;z-index:50;cursor:pointer;"></div>
+<div onclick="go(cur+1)" style="position:fixed;right:0;top:0;width:35%;height:100%;z-index:50;cursor:pointer;"></div>
+
+<!-- Logo oben links -->
+<img src="logo.png" alt="Logo" onerror="this.style.display='none'"
+  style="position:fixed;top:14px;left:18px;width:30px;height:30px;object-fit:contain;border-radius:50%;z-index:100;opacity:0.65;">
+
+<!-- Dots zentriert unten, kein Kasten -->
+<div id="dots" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:100;"></div>
 
 <script>
   const slides = document.querySelectorAll('.slide');
@@ -1020,30 +1022,24 @@
   const prog   = document.getElementById('progress');
   let cur = 0;
 
-  // Build dots
   slides.forEach((_, i) => {
     const d = document.createElement('div');
     d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.onclick = () => go(i);
+    d.onclick = (e) => { e.stopPropagation(); go(i); };
     dotsEl.appendChild(d);
   });
 
   function go(n) {
     slides[cur].classList.remove('active');
     slides[cur].classList.add('exit');
-    setTimeout(() => slides[cur < n ? cur : cur].classList.remove('exit'), 500);
     const prev = cur;
     cur = Math.max(0, Math.min(slides.length - 1, n));
     slides[cur].classList.add('active');
     setTimeout(() => slides[prev].classList.remove('exit'), 500);
-
     document.querySelectorAll('.dot').forEach((d,i) =>
       d.classList.toggle('active', i === cur));
     prog.style.width = ((cur + 1) / slides.length * 100) + '%';
   }
-
-  document.getElementById('next').onclick = () => go(cur + 1);
-  document.getElementById('prev').onclick = () => go(cur - 1);
 
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
