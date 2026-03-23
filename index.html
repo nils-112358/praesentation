@@ -430,7 +430,122 @@
   }
 
   /* ─── FINAL SLIDE ─── */
-  #s6 { justify-content: center; text-align: center; align-items: center; }
+  #s12 { justify-content: center; text-align: center; align-items: center; }
+
+  /* ─── LIQUID DEMO ─── */
+  .liquid-demo {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+
+  .ld-row {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .ld-person {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    min-width: 72px;
+  }
+
+  .ld-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .ld-avatar.expert {
+    border-color: rgba(255,209,102,0.4);
+    background: rgba(255,209,102,0.08);
+  }
+
+  .ld-name {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .ld-arrow {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .ld-arrow::after {
+    content: '→';
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: var(--surface);
+    padding: 0 8px;
+  }
+
+  .ld-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  /* ─── WORLD MAP STATS ─── */
+  .world-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    flex: 1;
+  }
+
+  .world-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .world-card .flag { font-size: 22px; margin-bottom: 6px; display: block; }
+  .world-card h3 { font-size: 0.9rem; font-weight: 600; color: var(--accent2); margin-bottom: 4px; }
+  .world-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+  /* ─── KRITIK ─── */
+  .pro-con {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .pro-block, .con-block {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid;
+  }
+
+  .pro-block { border-color: rgba(100,200,120,0.25); }
+  .con-block { border-color: rgba(255,107,43,0.25); }
+
+  .pro-block h3 { color: #6dc87a; font-size: 0.9rem; font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 14px; }
+  .con-block h3 { color: var(--accent); font-size: 0.9rem; font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 14px; }
+
+  .pro-block li, .con-block li {
+    font-size: 0.88rem; color: rgba(232,230,223,0.8);
+    padding-left: 16px; position: relative;
+    margin-bottom: 8px; line-height: 1.5;
+    list-style: none;
+  }
+
+  .pro-block li::before { content: '+'; position: absolute; left: 0; color: #6dc87a; font-family: var(--mono); }
+  .con-block li::before { content: '−'; position: absolute; left: 0; color: var(--accent); font-family: var(--mono); }
 
   .quote-block {
     background: var(--surface);
@@ -488,7 +603,7 @@
   <!-- SLIDE 1: Titel -->
   <section class="slide active" id="s1">
     <div class="kicker">Referat · Politik</div>
-    <span class="skull">🏴‍☠️</span>
+    <img src="piraten.png" alt="Piratenpartei Deutschland" style="height: clamp(60px, 8vw, 100px); width: auto; margin-bottom: 28px; display: block;">
     <h1>Die Piraten-<br><span class="accent-line">partei</span></h1>
     <p class="subtitle">Gegründet 2006 · Netzpolitik · Basisdemokratie</p>
   </section>
@@ -500,6 +615,7 @@
       <span class="slide-label">Überblick</span>
     </div>
     <h2>Was sind die<br><span class="accent-line">Piraten?</span></h2>
+    <img src="piraten.png" alt="Piratenpartei Deutschland" style="height:36px; width:auto; margin-bottom:20px; opacity:0.9; display:block;">
     <div class="stats">
       <div class="stat">
         <span class="stat-num">2006</span>
@@ -635,10 +751,232 @@
     </div>
   </section>
 
-  <!-- SLIDE 6: Fazit -->
+  <!-- SLIDE 6: Liquid Democracy vertieft -->
   <section class="slide" id="s6">
-    <div class="slide-header" style="justify-content:center;">
+    <div class="slide-header">
       <span class="slide-num">05</span>
+      <span class="slide-label">Liquid Democracy</span>
+    </div>
+    <h2>Demokratie<br><span class="accent-line">neu gedacht</span></h2>
+    <div class="liquid-demo">
+      <p style="font-size:0.85rem; color:var(--muted); font-family:var(--mono); margin-bottom:18px; letter-spacing:0.05em;">BEISPIEL: Abstimmung über Netzpolitik-Gesetz</p>
+      <div class="ld-row">
+        <div class="ld-person">
+          <div class="ld-avatar">👤</div>
+          <span class="ld-name">Anna</span>
+          <span class="ld-label">stimmt selbst</span>
+        </div>
+        <div style="flex:1; height:1px; background:var(--border);"></div>
+        <div class="ld-person">
+          <div class="ld-avatar">✅</div>
+          <span class="ld-name">JA</span>
+        </div>
+      </div>
+      <div class="ld-row">
+        <div class="ld-person">
+          <div class="ld-avatar">👤</div>
+          <span class="ld-name">Ben</span>
+          <span class="ld-label">delegiert</span>
+        </div>
+        <div class="ld-arrow"></div>
+        <div class="ld-person">
+          <div class="ld-avatar expert">🎓</div>
+          <span class="ld-name">IT-Experte</span>
+          <span class="ld-label">stimmt für Ben</span>
+        </div>
+      </div>
+      <div class="ld-row" style="margin-bottom:0">
+        <div class="ld-person">
+          <div class="ld-avatar">👤</div>
+          <span class="ld-name">Clara</span>
+          <span class="ld-label">delegiert</span>
+        </div>
+        <div class="ld-arrow"></div>
+        <div class="ld-person">
+          <div class="ld-avatar expert">🎓</div>
+          <span class="ld-name">IT-Experte</span>
+          <span class="ld-label">3 Stimmen total</span>
+        </div>
+      </div>
+    </div>
+    <p class="big-text">Delegation ist jederzeit widerrufbar. Wer sich auskennt, bekommt mehr Gewicht — wer will, stimmt direkt. <strong style="color:var(--accent2)">Mischung aus direkter und repräsentativer Demokratie.</strong></p>
+  </section>
+
+  <!-- SLIDE 7: International -->
+  <section class="slide" id="s7">
+    <div class="slide-header">
+      <span class="slide-num">06</span>
+      <span class="slide-label">International</span>
+    </div>
+    <h2>Eine globale<br><span class="accent-line">Bewegung</span></h2>
+    <div class="world-grid">
+      <div class="world-card">
+        <span class="flag">🇸🇪</span>
+        <h3>Schweden</h3>
+        <p>Ursprungsland. 2009 EU-Parlament-Einzug mit 7,1 %. Rick Falkvinge als Gründer.</p>
+      </div>
+      <div class="world-card">
+        <span class="flag">🇩🇪</span>
+        <h3>Deutschland</h3>
+        <p>Stärkste nationale Sektion. 2012 Hochpunkt mit 4 Landtagen und 35.000 Mitgliedern.</p>
+      </div>
+      <div class="world-card">
+        <span class="flag">🇮🇸</span>
+        <h3>Island</h3>
+        <p>Heute noch aktiv und relevant. 2016: 14,5 % bei Parlamentswahl — drittgrößte Partei.</p>
+      </div>
+      <div class="world-card">
+        <span class="flag">🇨🇿</span>
+        <h3>Tschechien</h3>
+        <p>Stärkste europäische Sektion heute. 2021: Teil der Regierungskoalition mit 15,6 %.</p>
+      </div>
+      <div class="world-card">
+        <span class="flag">🌍</span>
+        <h3>~50 Länder</h3>
+        <p>Pirate Parties International (PPI) koordiniert weltweit. Von Brasilien bis Australien.</p>
+      </div>
+      <div class="world-card">
+        <span class="flag">🇪🇺</span>
+        <h3>EU-Parlament</h3>
+        <p>Mehrere Mandate über die Jahre. Fokus auf Digitalpolitik und Bürgerrechte in Brüssel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: Parteivorstand -->
+  <section class="slide" id="s8">
+    <div class="slide-header">
+      <span class="slide-num">07</span>
+      <span class="slide-label">Parteivorstand</span>
+    </div>
+    <h2>Wer führt die<br><span class="accent-line">Piraten?</span></h2>
+    <div class="cards" style="margin-bottom:20px;">
+      <div class="card">
+        <span class="card-icon">🧑‍✈️</span>
+        <h3>Vorsitzender</h3>
+        <p><strong style="color:var(--text)">Thomas Ganskow</strong><br>Bundesvorsitzender seit 2022. Langjähriges Mitglied, IT-Hintergrund.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🗂️</span>
+        <h3>Struktur</h3>
+        <p>Kleiner Bundesvorstand, bewusst flach gehalten. Keine „Partei-Elite" — Prinzip der Piraten.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🗳️</span>
+        <h3>Wahl</h3>
+        <p>Vorstand wird auf Bundesparteitagen gewählt. Jedes Mitglied kann kandidieren und abstimmen.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📉</span>
+        <h3>Bedeutung heute</h3>
+        <p>Partei hat kaum noch Mandate. Vorstand verwaltet hauptsächlich die verbleibende Struktur.</p>
+      </div>
+    </div>
+    <p class="big-text" style="color:var(--muted); font-size:0.95rem;">Hinweis: Die Piraten hatten nie starke Einzelpersönlichkeiten — Programm und Basis standen immer über Personenkult.</p>
+  </section>
+
+  <!-- SLIDE 9: Parteiprogramm -->
+  <section class="slide" id="s9">
+    <div class="slide-header">
+      <span class="slide-num">08</span>
+      <span class="slide-label">Parteiprogramm</span>
+    </div>
+    <h2>Aktuelles<br><span class="accent-line">Programm</span></h2>
+    <div class="two-col">
+      <div class="col-block">
+        <h3>Kernforderungen (heute)</h3>
+        <ul>
+          <li>Freier Zugang zu Wissen &amp; Bildung</li>
+          <li>Abschaffung der Vorratsdatenspeicherung</li>
+          <li>Bedingungsloses Grundeinkommen (BGE)</li>
+          <li>Reform des Urheberrechts zugunsten der Nutzer</li>
+          <li>Transparenz staatlichen Handelns</li>
+          <li>Digitalisierung der Verwaltung</li>
+        </ul>
+      </div>
+      <div class="col-block">
+        <h3>Gesellschaftspolitik</h3>
+        <ul>
+          <li>Legalisierung von Cannabis (bereits umgesetzt!)</li>
+          <li>Gleichstellung aller Geschlechter &amp; Lebensformen</li>
+          <li>Trennung von Kirche und Staat</li>
+          <li>Offene Einwanderungspolitik</li>
+          <li>Direkte Demokratie durch Volksabstimmungen</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:20px; background:rgba(255,209,102,0.07); border:1px solid rgba(255,209,102,0.2); border-radius:10px; padding:14px 20px;">
+      <p style="font-size:0.88rem; color:rgba(232,230,223,0.8);">💡 Viele Forderungen wurden inzwischen von anderen Parteien übernommen — z. B. Cannabis-Legalisierung (SPD/Grüne) und Datenschutz-Grundverordnung (DSGVO).</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: Aktuelle Politik -->
+  <section class="slide" id="s10">
+    <div class="slide-header">
+      <span class="slide-num">09</span>
+      <span class="slide-label">Aktuelle Politik</span>
+    </div>
+    <h2>Piraten heute —<br><span class="accent-line">Bund &amp; Land</span></h2>
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">🏛️</span>
+        <h3>Bund</h3>
+        <p>Kein Bundestagsmandat seit 2013. Kandidieren weiterhin, aber unter 1 %. Kaum Einfluss auf Bundesebene.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🗺️</span>
+        <h3>Land</h3>
+        <p>Keine Landtagsmandate mehr in Deutschland. Letzter Einzug: Saarland 2012. Seither aus allen Landtagen geflogen.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🇪🇺</span>
+        <h3>Europa</h3>
+        <p>Aktiv im EU-Parlament über Partnerparteien. Tschechische Piraten stellten 2021 Ministerposten in der Regierung.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌐</span>
+        <h3>Digital-Agenda</h3>
+        <p>Themen wie KI-Regulierung, Chatkontrolle und Datenschutz treiben Piraten weiter an — auch ohne Mandate.</p>
+      </div>
+    </div>
+    <div style="margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 20px;">
+      <p style="font-size:0.88rem; color:rgba(232,230,223,0.75);">📍 <strong style="color:var(--accent2)">Bayern:</strong> Piraten traten zuletzt 2023 zur Landtagswahl an — Ergebnis unter 0,5 %. Kein Einzug in den Bayerischen Landtag.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: Kontroversen -->
+  <section class="slide" id="s11">
+    <div class="slide-header">
+      <span class="slide-num">10</span>
+      <span class="slide-label">Kontroversen</span>
+    </div>
+    <h2>Skandale &amp;<br><span class="accent-line">Streitpunkte</span></h2>
+    <div class="pro-con">
+      <div class="con-block" style="border-color:rgba(255,107,43,0.3);">
+        <h3>⚡ Interne Konflikte</h3>
+        <ul>
+          <li><strong style="color:var(--text)">„Shitstorms" intern:</strong> Öffentliche Twitter-Streitigkeiten zwischen Mitgliedern schadeten dem Image massiv</li>
+          <li><strong style="color:var(--text)">Sexismusvorwürfe:</strong> 2012 Diskussion über frauenfeindliche Kommentare in Piratenforen</li>
+          <li><strong style="color:var(--text)">Führungslosigkeit:</strong> Häufige Rücktritte im Vorstand, kein stabiles Führungsteam</li>
+          <li><strong style="color:var(--text)">Liquid Feedback scheiterte:</strong> Nur wenige Mitglieder nutzten die Plattform aktiv</li>
+        </ul>
+      </div>
+      <div class="con-block" style="border-color:rgba(200,100,220,0.3);">
+        <h3>🔥 Gesellschaftliche Debatten</h3>
+        <ul>
+          <li><strong style="color:var(--text)">Urheberrecht:</strong> Vorwurf, sie würden geistiges Eigentum von Künstlern nicht schützen wollen</li>
+          <li><strong style="color:var(--text)">Chatkontrolle (EU):</strong> Piraten kämpfen dagegen — Gegner nennen es Notwendigkeit gegen Kindesmissbrauch</li>
+          <li><strong style="color:var(--text)">Grundeinkommen:</strong> Zu teuer? Oder Zukunftsmodell? Stark umstritten</li>
+          <li><strong style="color:var(--text)">Überwachung vs. Sicherheit:</strong> Wie viel Datenschutz ist zu viel?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: Fazit -->
+  <section class="slide" id="s12">
+    <div class="slide-header" style="justify-content:center;">
+      <span class="slide-num">11</span>
       <span class="slide-label">Fazit</span>
     </div>
     <h2 style="text-align:center;">Die Debatte gewonnen,<br><span class="accent-line">die Partei verloren</span></h2>
@@ -659,6 +997,7 @@
 
 <!-- Navigation -->
 <nav>
+  <img src="logo.png" alt="Logo" style="width:24px; height:24px; object-fit:contain; opacity:0.85; border-radius:50%;">
   <button class="nav-btn" id="prev" title="Zurück">&#8592;</button>
   <div class="dots" id="dots"></div>
   <button class="nav-btn" id="next" title="Vor">&#8594;</button>
