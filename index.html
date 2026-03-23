@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Die Piratenpartei</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #1a1d24;
+    --accent: #ff6b2b;
+    --accent2: #ffd166;
+    --text: #e8e6df;
+    --muted: #7a7870;
+    --border: rgba(255,107,43,0.2);
+    --mono: 'Space Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    overflow: hidden;
+  }
+
+  /* ─── GRID NOISE ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,107,43,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,107,43,0.04) 40px);
+    pointer-events: none; z-index: 0;
+  }
+
+  .slides {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    padding: 48px 64px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s, transform 0.5s;
+    transform: translateY(20px);
+    z-index: 1;
+  }
+
+  .slide.active {
+    opacity: 1; pointer-events: all;
+    transform: translateY(0);
+  }
+
+  .slide.exit {
+    opacity: 0; transform: translateY(-20px);
+  }
+
+  /* ─── HEADER STRIP ─── */
+  .slide-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .slide-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(255,107,43,0.1);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  .slide-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ─── SLIDE TITLES ─── */
+  h1 {
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+
+  .accent-line {
+    display: block;
+    color: var(--accent);
+  }
+
+  /* ─── BODY TEXT ─── */
+  p, li {
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    line-height: 1.7;
+    color: rgba(232,230,223,0.85);
+  }
+
+  .big-text {
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    line-height: 1.6;
+    max-width: 720px;
+  }
+
+  /* ─── CARDS ─── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    flex: 1;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .card:hover { border-color: rgba(255,107,43,0.5); }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--accent2);
+  }
+
+  .card p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  /* ─── TIMELINE ─── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+  }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 80px 1px 1fr;
+    gap: 0 24px;
+    align-items: start;
+    padding-bottom: 20px;
+    position: relative;
+  }
+
+  .tl-year {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: right;
+    padding-top: 2px;
+  }
+
+  .tl-line {
+    background: var(--border);
+    width: 1px;
+    align-self: stretch;
+    position: relative;
+  }
+
+  .tl-line::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 50%;
+    transform: translateX(-50%);
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .tl-content {
+    padding-top: 0;
+  }
+
+  .tl-content strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .tl-content span {
+    font-size: 0.84rem;
+    color: var(--muted);
+  }
+
+  /* ─── STAT BLOCKS ─── */
+  .stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 28px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+
+  /* ─── TAG CLOUD ─── */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--accent2);
+    background: rgba(255,209,102,0.06);
+    letter-spacing: 0.04em;
+  }
+
+  .tag.big {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-color: rgba(255,107,43,0.4);
+    color: var(--accent);
+    background: rgba(255,107,43,0.08);
+  }
+
+  /* ─── TWO-COL ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    flex: 1;
+  }
+
+  .col-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+
+  .col-block h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    letter-spacing: 0.06em;
+  }
+
+  .col-block ul {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .col-block ul li {
+    font-size: 0.9rem;
+    padding-left: 18px;
+    position: relative;
+    color: rgba(232,230,223,0.8);
+  }
+
+  .col-block ul li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--accent);
+    font-family: var(--mono);
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 10px 20px;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-btn {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    font-family: var(--mono); font-size: 18px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-btn:hover { background: rgba(255,107,43,0.15); color: var(--accent); }
+
+  .dots {
+    display: flex; gap: 6px;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .dot.active { background: var(--accent); transform: scale(1.4); }
+
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    z-index: 200;
+  }
+
+  /* ─── LOGO / DECO ─── */
+  .skull {
+    font-size: clamp(4rem, 8vw, 7rem);
+    line-height: 1;
+    display: block;
+    margin-bottom: 16px;
+    filter: grayscale(0.2);
+  }
+
+  .flag-stripe {
+    display: inline-block;
+    width: 4px; height: 1.2em;
+    background: var(--accent);
+    margin-right: 14px;
+    vertical-align: middle;
+    border-radius: 2px;
+  }
+
+  /* ─── SLIDE 1 SPECIFIC ─── */
+  #s1 { justify-content: center; }
+
+  #s1 .kicker {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  #s1 .kicker::before {
+    content: '';
+    display: inline-block;
+    width: 32px; height: 1px;
+    background: var(--accent);
+  }
+
+  #s1 .subtitle {
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    color: var(--muted);
+    margin-top: 20px;
+    font-family: var(--mono);
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── FINAL SLIDE ─── */
+  #s6 { justify-content: center; text-align: center; align-items: center; }
+
+  .quote-block {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 24px 32px;
+    border-radius: 0 10px 10px 0;
+    max-width: 620px;
+    margin: 24px 0;
+  }
+
+  .quote-block p {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .quote-block cite {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* keyboard hint */
+  .key-hint {
+    position: fixed;
+    top: 20px; right: 24px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    z-index: 100;
+    letter-spacing: 0.08em;
+  }
+
+  kbd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="key-hint"><kbd>←</kbd> <kbd>→</kbd> navigieren</div>
+
+<div class="slides" id="slides">
+
+  <!-- SLIDE 1: Titel -->
+  <section class="slide active" id="s1">
+    <div class="kicker">Referat · Politik</div>
+    <span class="skull">🏴‍☠️</span>
+    <h1>Die Piraten-<br><span class="accent-line">partei</span></h1>
+    <p class="subtitle">Gegründet 2006 · Netzpolitik · Basisdemokratie</p>
+  </section>
+
+  <!-- SLIDE 2: Überblick -->
+  <section class="slide" id="s2">
+    <div class="slide-header">
+      <span class="slide-num">01</span>
+      <span class="slide-label">Überblick</span>
+    </div>
+    <h2>Was sind die<br><span class="accent-line">Piraten?</span></h2>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-num">2006</span>
+        <span class="stat-label">Gründung (SE)</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">2006</span>
+        <span class="stat-label">Deutschland</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">35.000+</span>
+        <span class="stat-label">Mitglieder (2012)</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">~50</span>
+        <span class="stat-label">Länder weltweit</span>
+      </div>
+    </div>
+    <p class="big-text">Die Piratenpartei entstand aus der Bewegung gegen Urheberrechts­verfolgung im Internet. Rick Falkvinge gründete sie in Schweden — kurz danach folgte Deutschland. Ihr Fokus: <strong style="color:var(--accent2)">digitale Bürgerrechte, Transparenz und Demokratie im Netz.</strong></p>
+  </section>
+
+  <!-- SLIDE 3: Geschichte -->
+  <section class="slide" id="s3">
+    <div class="slide-header">
+      <span class="slide-num">02</span>
+      <span class="slide-label">Geschichte</span>
+    </div>
+    <h2>Aufstieg &amp;<br><span class="accent-line">Niedergang</span></h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <span class="tl-year">2006</span>
+        <div class="tl-line"></div>
+        <div class="tl-content"><strong>Gründung in Deutschland</strong><span>Kleine Nischenpartei, kaum Resonanz</span></div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-year">2009</span>
+        <div class="tl-line"></div>
+        <div class="tl-content"><strong>Bundestagswahl: 2,0 %</strong><span>Kein Einzug, aber starkes Ergebnis für Neupartei</span></div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-year">2011</span>
+        <div class="tl-line"></div>
+        <div class="tl-content"><strong>Durchbruch: Berlin 8,9 %</strong><span>Einzug in vier Landtage binnen einem Jahr</span></div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-year">2012</span>
+        <div class="tl-line"></div>
+        <div class="tl-content"><strong>Höchststand: ~35.000 Mitglieder</strong><span>Medienrummel, „Piraten-Hype"</span></div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-year">2013</span>
+        <div class="tl-line"></div>
+        <div class="tl-content"><strong>Bundestagswahl: 2,2 % — gescheitert</strong><span>5-%-Hürde verfehlt, Absturz beginnt</span></div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-year">Heute</span>
+        <div class="tl-line"></div>
+        <div class="tl-content"><strong>Bedeutungslos im Bundestag</strong><span>Themen leben weiter — in anderen Parteien</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Themen -->
+  <section class="slide" id="s4">
+    <div class="slide-header">
+      <span class="slide-num">03</span>
+      <span class="slide-label">Kernthemen</span>
+    </div>
+    <h2>Was wollen die<br><span class="accent-line">Piraten?</span></h2>
+    <div class="tags">
+      <span class="tag big">Netzneutralität</span>
+      <span class="tag big">Datenschutz</span>
+      <span class="tag big">Informationsfreiheit</span>
+      <span class="tag">Urheberrechtsreform</span>
+      <span class="tag">Transparenz</span>
+      <span class="tag">Liquid Democracy</span>
+      <span class="tag">Grundeinkommen</span>
+      <span class="tag">Offener Quellcode</span>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">🔒</span>
+        <h3>Datenschutz</h3>
+        <p>Gegen Vorratsdatenspeicherung. Staatliche Überwachung einschränken. Privatsphäre als Grundrecht.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚖️</span>
+        <h3>Urheberrecht</h3>
+        <p>Privates Teilen von Dateien soll erlaubt sein. Kulturelles Erbe frei zugänglich machen.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌐</span>
+        <h3>Netzneutralität</h3>
+        <p>Alle Datenpakete gleich behandeln. Keine Zwei-Klassen-Gesellschaft im Internet.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🗳️</span>
+        <h3>Liquid Democracy</h3>
+        <p>Stimme direkt abgeben oder an Experten delegieren. Mehr direkte Demokratie.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: Besonderheiten -->
+  <section class="slide" id="s5">
+    <div class="slide-header">
+      <span class="slide-num">04</span>
+      <span class="slide-label">Besonderheiten</span>
+    </div>
+    <h2>Was macht sie<br><span class="accent-line">anders?</span></h2>
+    <div class="two-col">
+      <div class="col-block">
+        <h3>Digitale Werkzeuge</h3>
+        <ul>
+          <li><strong>Liquid Feedback</strong> — Abstimmungsplattform für Mitglieder</li>
+          <li><strong>Piratenpad</strong> — kollaboratives Schreiben in Echtzeit</li>
+          <li>Anträge online stellen &amp; diskutieren</li>
+          <li>Transparenz aller parteiinternen Vorgänge</li>
+        </ul>
+      </div>
+      <div class="col-block">
+        <h3>Parteistruktur</h3>
+        <ul>
+          <li>Flache Hierarchie, kaum Parteiführung</li>
+          <li>Offene Mitgliedschaft ohne Hürden</li>
+          <li>Basisdemokratisch: jeder entscheidet mit</li>
+          <li>Prinzip: mehr Schwarmintelligenz, weniger Elite</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:24px;">
+      <p class="big-text">→ <strong style="color:var(--accent2)">Liquid Democracy</strong>: Du kannst bei Abstimmungen direkt abstimmen <em>oder</em> deine Stimme an jemanden delegieren, dem du vertraust — und jederzeit zurückziehen.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: Fazit -->
+  <section class="slide" id="s6">
+    <div class="slide-header" style="justify-content:center;">
+      <span class="slide-num">05</span>
+      <span class="slide-label">Fazit</span>
+    </div>
+    <h2 style="text-align:center;">Die Debatte gewonnen,<br><span class="accent-line">die Partei verloren</span></h2>
+    <div class="quote-block">
+      <p>„Die Piraten haben als erste Partei in Deutschland erkannt, dass das Internet keine technische Frage ist — sondern eine politische."</p>
+      <cite>— Häufige Einschätzung in der Politikwissenschaft</cite>
+    </div>
+    <div class="tags" style="justify-content:center; margin-top:20px;">
+      <span class="tag">DSGVO 2018</span>
+      <span class="tag">Netzsperren-Debatte</span>
+      <span class="tag">Digitalausschuss im Bundestag</span>
+      <span class="tag">Open-Data-Gesetze</span>
+    </div>
+    <p style="color:var(--muted); font-family:var(--mono); font-size:0.85rem; margin-top:16px; letter-spacing:0.05em;">Alle obigen Themen: ursprünglich von den Piraten auf die Agenda gesetzt 🏴‍☠️</p>
+  </section>
+
+</div>
+
+<!-- Navigation -->
+<nav>
+  <button class="nav-btn" id="prev" title="Zurück">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="next" title="Vor">&#8594;</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const prog   = document.getElementById('progress');
+  let cur = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    setTimeout(() => slides[cur < n ? cur : cur].classList.remove('exit'), 500);
+    const prev = cur;
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 500);
+
+    document.querySelectorAll('.dot').forEach((d,i) =>
+      d.classList.toggle('active', i === cur));
+    prog.style.width = ((cur + 1) / slides.length * 100) + '%';
+  }
+
+  document.getElementById('next').onclick = () => go(cur + 1);
+  document.getElementById('prev').onclick = () => go(cur - 1);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(cur - 1);
+  });
+
+  prog.style.width = (1 / slides.length * 100) + '%';
+</script>
+</body>
+</html>
