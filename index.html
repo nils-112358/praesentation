@@ -1,1052 +1,648 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Die Piratenpartei</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0a0c10;
-    --surface: #111318;
-    --surface2: #1a1d24;
-    --accent: #ff6b2b;
-    --accent2: #ffd166;
-    --text: #e8e6df;
-    --muted: #7a7870;
-    --border: rgba(255,107,43,0.2);
-    --mono: 'Space Mono', monospace;
-    --display: 'Syne', sans-serif;
-  }
-
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--display);
-    overflow: hidden;
-  }
-
-  /* ─── GRID NOISE ─── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,107,43,0.04) 40px),
-      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,107,43,0.04) 40px);
-    pointer-events: none; z-index: 0;
-  }
-
-  .slides {
-    width: 100%; height: 100%;
-    position: relative;
-  }
-
-  .slide {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    padding: 48px 64px;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.5s, transform 0.5s;
-    transform: translateY(20px);
-    z-index: 1;
-  }
-
-  .slide.active {
-    opacity: 1; pointer-events: all;
-    transform: translateY(0);
-  }
-
-  .slide.exit {
-    opacity: 0; transform: translateY(-20px);
-  }
-
-  /* ─── HEADER STRIP ─── */
-  .slide-header {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 40px;
-  }
-
-  .slide-num {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    background: rgba(255,107,43,0.1);
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    border-radius: 4px;
-    letter-spacing: 0.1em;
-  }
-
-  .slide-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-
-  /* ─── SLIDE TITLES ─── */
-  h1 {
-    font-size: clamp(3rem, 6vw, 5.5rem);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    margin-bottom: 24px;
-  }
-
-  h2 {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    margin-bottom: 28px;
-  }
-
-  .accent-line {
-    display: block;
-    color: var(--accent);
-  }
-
-  /* ─── BODY TEXT ─── */
-  p, li {
-    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
-    line-height: 1.7;
-    color: rgba(232,230,223,0.85);
-  }
-
-  .big-text {
-    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
-    line-height: 1.6;
-    max-width: 720px;
-  }
-
-  /* ─── CARDS ─── */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    flex: 1;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-  }
-
-  .card:hover { border-color: rgba(255,107,43,0.5); }
-
-  .card-icon {
-    font-size: 28px;
-    margin-bottom: 12px;
-    display: block;
-  }
-
-  .card h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--accent2);
-  }
-
-  .card p {
-    font-size: 0.88rem;
-    line-height: 1.6;
-    color: var(--muted);
-  }
-
-  /* ─── TIMELINE ─── */
-  .timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    flex: 1;
-  }
-
-  .tl-item {
-    display: grid;
-    grid-template-columns: 80px 1px 1fr;
-    gap: 0 24px;
-    align-items: start;
-    padding-bottom: 20px;
-    position: relative;
-  }
-
-  .tl-year {
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--accent);
-    text-align: right;
-    padding-top: 2px;
-  }
-
-  .tl-line {
-    background: var(--border);
-    width: 1px;
-    align-self: stretch;
-    position: relative;
-  }
-
-  .tl-line::before {
-    content: '';
-    position: absolute;
-    top: 6px; left: 50%;
-    transform: translateX(-50%);
-    width: 8px; height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent);
-  }
-
-  .tl-content {
-    padding-top: 0;
-  }
-
-  .tl-content strong {
-    display: block;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .tl-content span {
-    font-size: 0.84rem;
-    color: var(--muted);
-  }
-
-  /* ─── STAT BLOCKS ─── */
-  .stats {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
-
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 28px;
-    text-align: center;
-  }
-
-  .stat-num {
-    font-family: var(--mono);
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--accent);
-    display: block;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-family: var(--mono);
-  }
-
-  /* ─── TAG CLOUD ─── */
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  .tag {
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    padding: 6px 14px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    color: var(--accent2);
-    background: rgba(255,209,102,0.06);
-    letter-spacing: 0.04em;
-  }
-
-  .tag.big {
-    font-size: 1rem;
-    padding: 10px 20px;
-    border-color: rgba(255,107,43,0.4);
-    color: var(--accent);
-    background: rgba(255,107,43,0.08);
-  }
-
-  /* ─── TWO-COL ─── */
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    flex: 1;
-  }
-
-  .col-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px;
-  }
-
-  .col-block h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--accent2);
-    margin-bottom: 16px;
-    font-family: var(--mono);
-    letter-spacing: 0.06em;
-  }
-
-  .col-block ul {
-    list-style: none;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-
-  .col-block ul li {
-    font-size: 0.9rem;
-    padding-left: 18px;
-    position: relative;
-    color: rgba(232,230,223,0.8);
-  }
-
-  .col-block ul li::before {
-    content: '→';
-    position: absolute; left: 0;
-    color: var(--accent);
-    font-family: var(--mono);
-  }
-
-  /* ─── NAV ─── */
-  nav {
-    position: fixed;
-    bottom: 32px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; align-items: center; gap: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 10px 20px;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-  }
-
-  .nav-btn {
-    background: none; border: none;
-    color: var(--muted); cursor: pointer;
-    font-family: var(--mono); font-size: 18px;
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .nav-btn:hover { background: rgba(255,107,43,0.15); color: var(--accent); }
-
-  .dots {
-    display: flex; gap: 6px;
-  }
-
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--muted);
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-  }
-
-  .dot.active { background: var(--accent); transform: scale(1.4); }
-
-  .progress {
-    position: fixed;
-    top: 0; left: 0;
-    height: 2px;
-    background: var(--accent);
-    transition: width 0.4s ease;
-    z-index: 200;
-  }
-
-  /* ─── LOGO / DECO ─── */
-  .skull {
-    font-size: clamp(4rem, 8vw, 7rem);
-    line-height: 1;
-    display: block;
-    margin-bottom: 16px;
-    filter: grayscale(0.2);
-  }
-
-  .flag-stripe {
-    display: inline-block;
-    width: 4px; height: 1.2em;
-    background: var(--accent);
-    margin-right: 14px;
-    vertical-align: middle;
-    border-radius: 2px;
-  }
-
-  /* ─── SLIDE 1 SPECIFIC ─── */
-  #s1 { justify-content: center; }
-
-  #s1 .kicker {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    display: flex; align-items: center; gap: 10px;
-  }
-
-  #s1 .kicker::before {
-    content: '';
-    display: inline-block;
-    width: 32px; height: 1px;
-    background: var(--accent);
-  }
-
-  #s1 .subtitle {
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
-    color: var(--muted);
-    margin-top: 20px;
-    font-family: var(--mono);
-    letter-spacing: 0.05em;
-  }
-
-  /* ─── FINAL SLIDE ─── */
-  #s12 { justify-content: center; text-align: center; align-items: center; }
-
-  /* ─── LIQUID DEMO ─── */
-  .liquid-demo {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
-  }
-
-  .ld-row {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 14px;
-  }
-
-  .ld-person {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    min-width: 72px;
-  }
-
-  .ld-avatar {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-  }
-
-  .ld-avatar.expert {
-    border-color: rgba(255,209,102,0.4);
-    background: rgba(255,209,102,0.08);
-  }
-
-  .ld-name {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-align: center;
-  }
-
-  .ld-arrow {
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .ld-arrow::after {
-    content: '→';
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--accent);
-    background: var(--surface);
-    padding: 0 8px;
-  }
-
-  .ld-label {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--accent2);
-    text-align: center;
-    margin-top: 2px;
-  }
-
-  /* ─── WORLD MAP STATS ─── */
-  .world-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    flex: 1;
-  }
-
-  .world-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
-  }
-
-  .world-card .flag { font-size: 22px; margin-bottom: 6px; display: block; }
-  .world-card h3 { font-size: 0.9rem; font-weight: 600; color: var(--accent2); margin-bottom: 4px; }
-  .world-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
-
-  /* ─── KRITIK ─── */
-  .pro-con {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    flex: 1;
-  }
-
-  .pro-block, .con-block {
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 24px;
-    border: 1px solid;
-  }
-
-  .pro-block { border-color: rgba(100,200,120,0.25); }
-  .con-block { border-color: rgba(255,107,43,0.25); }
-
-  .pro-block h3 { color: #6dc87a; font-size: 0.9rem; font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 14px; }
-  .con-block h3 { color: var(--accent); font-size: 0.9rem; font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 14px; }
-
-  .pro-block li, .con-block li {
-    font-size: 0.88rem; color: rgba(232,230,223,0.8);
-    padding-left: 16px; position: relative;
-    margin-bottom: 8px; line-height: 1.5;
-    list-style: none;
-  }
-
-  .pro-block li::before { content: '+'; position: absolute; left: 0; color: #6dc87a; font-family: var(--mono); }
-  .con-block li::before { content: '−'; position: absolute; left: 0; color: var(--accent); font-family: var(--mono); }
-
-  .quote-block {
-    background: var(--surface);
-    border-left: 3px solid var(--accent);
-    padding: 24px 32px;
-    border-radius: 0 10px 10px 0;
-    max-width: 620px;
-    margin: 24px 0;
-  }
-
-  .quote-block p {
-    font-size: 1.15rem;
-    font-style: italic;
-    color: var(--text);
-    line-height: 1.7;
-  }
-
-  .quote-block cite {
-    display: block;
-    margin-top: 10px;
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-
-  /* keyboard hint */
-  .key-hint {
-    position: fixed;
-    top: 20px; right: 24px;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-    z-index: 100;
-    letter-spacing: 0.08em;
-  }
-
-  kbd {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Die Piratenpartei | Referat Lea & Nils</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0c10;
+            --surface: #111318;
+            --surface2: #1a1d24;
+            --accent: #ff6b2b;
+            --accent2: #ffd166;
+            --text: #e8e6df;
+            --muted: #7a7870;
+            --border: rgba(255,107,43,0.2);
+            --mono: 'Space Mono', monospace;
+            --display: 'Syne', sans-serif;
+        }
+        html, body {
+            width: 100%; height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--display);
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,107,43,0.04) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,107,43,0.04) 40px);
+            pointer-events: none; z-index: 0;
+        }
+        .slides {
+            width: 100%; height: 100%;
+            position: relative;
+        }
+        .slide {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            padding: 36px 48px 55px;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateY(15px);
+            z-index: 1;
+            overflow-y: auto;
+        }
+        .slide.active {
+            opacity: 1; pointer-events: all;
+            transform: translateY(0);
+        }
+        .slide.exit {
+            opacity: 0; transform: translateY(-20px);
+        }
+        .slide-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 22px;
+        }
+        .slide-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--accent);
+            background: rgba(255,107,43,0.12);
+            border: 1px solid var(--border);
+            padding: 2px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.1em;
+        }
+        .slide-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        h1 {
+            font-size: clamp(2.5rem, 5.2vw, 4.8rem);
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+        }
+        h2 {
+            font-size: clamp(1.7rem, 3.3vw, 3rem);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            margin-bottom: 18px;
+        }
+        .accent-line { color: var(--accent); }
+        p, li {
+            font-size: clamp(0.88rem, 1.25vw, 1.05rem);
+            line-height: 1.6;
+            color: rgba(232,230,223,0.85);
+        }
+        .big-text {
+            font-size: clamp(0.95rem, 1.5vw, 1.25rem);
+            line-height: 1.6;
+            max-width: 700px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            flex: 1;
+            align-content: start;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .card-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .card h3 {
+            font-size: 0.9rem; font-weight: 600;
+            margin-bottom: 5px; color: var(--accent2);
+        }
+        .card p {
+            font-size: 0.8rem; line-height: 1.5; color: var(--muted);
+        }
+        .timeline {
+            display: flex; flex-direction: column; gap: 0; flex: 1;
+        }
+        .tl-item {
+            display: grid;
+            grid-template-columns: 70px 1px 1fr;
+            gap: 0 18px; align-items: start;
+            padding-bottom: 16px; position: relative;
+        }
+        .tl-year {
+            font-family: var(--mono);
+            font-size: 0.82rem; font-weight: 700;
+            color: var(--accent); text-align: right; padding-top: 1px;
+        }
+        .tl-line {
+            background: var(--border); width: 1px;
+            align-self: stretch; position: relative;
+        }
+        .tl-line::before {
+            content: '';
+            position: absolute; top: 4px; left: 50%;
+            transform: translateX(-50%);
+            width: 6px; height: 6px;
+            background: var(--accent); border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent);
+        }
+        .tl-content strong {
+            display: block; font-size: 0.88rem;
+            font-weight: 600; color: var(--text); margin-bottom: 2px;
+        }
+        .tl-content span {
+            font-size: 0.78rem; color: var(--muted);
+        }
+        .stats {
+            display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px 20px; text-align: center;
+        }
+        .stat-num {
+            font-family: var(--mono);
+            font-size: 1.8rem; font-weight: 700;
+            color: var(--accent); display: block; line-height: 1; margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 0.7rem; color: var(--muted);
+            letter-spacing: 0.08em; text-transform: uppercase;
+            font-family: var(--mono);
+        }
+        .tags {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+        }
+        .tag {
+            font-family: var(--mono);
+            font-size: 0.76rem; padding: 5px 12px;
+            border-radius: 100px; border: 1px solid var(--border);
+            color: var(--accent2); background: rgba(255,209,102,0.06);
+            letter-spacing: 0.04em;
+        }
+        .tag.big {
+            font-size: 0.9rem; padding: 7px 16px;
+            border-color: rgba(255,107,43,0.4);
+            color: var(--accent); background: rgba(255,107,43,0.08);
+        }
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px; flex: 1;
+        }
+        .col-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px;
+        }
+        .col-block h3 {
+            font-size: 0.88rem; font-weight: 600;
+            color: var(--accent2); margin-bottom: 12px;
+            font-family: var(--mono); letter-spacing: 0.06em;
+        }
+        .col-block ul {
+            list-style: none;
+            display: flex; flex-direction: column; gap: 7px;
+        }
+        .col-block ul li {
+            font-size: 0.82rem; padding-left: 16px; position: relative;
+            color: rgba(232,230,223,0.8);
+        }
+        .col-block ul li::before {
+            content: '→'; position: absolute; left: 0;
+            color: var(--accent); font-family: var(--mono);
+        }
+        .world-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px; flex: 1;
+        }
+        .world-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px;
+        }
+        .world-card .flag { font-size: 18px; margin-bottom: 5px; display: block; }
+        .world-card h3 { font-size: 0.82rem; font-weight: 600; color: var(--accent2); margin-bottom: 3px; }
+        .world-card p { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+        .pro-con {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px; flex: 1;
+        }
+        .pro-block, .con-block {
+            background: var(--surface);
+            border-radius: 12px; padding: 18px; border: 1px solid;
+        }
+        .pro-block { border-color: rgba(100,200,120,0.25); }
+        .con-block { border-color: rgba(255,107,43,0.25); }
+        .pro-block h3, .con-block h3 {
+            font-size: 0.82rem; font-family: var(--mono);
+            letter-spacing: 0.08em; margin-bottom: 10px;
+        }
+        .pro-block h3 { color: #6dc87a; }
+        .con-block h3 { color: var(--accent); }
+        .pro-block li, .con-block li {
+            font-size: 0.8rem; color: rgba(232,230,223,0.8);
+            padding-left: 14px; position: relative;
+            margin-bottom: 6px; line-height: 1.5; list-style: none;
+        }
+        .pro-block li::before { content: '+'; position: absolute; left: 0; color: #6dc87a; font-family: var(--mono); }
+        .con-block li::before { content: '−'; position: absolute; left: 0; color: var(--accent); font-family: var(--mono); }
+        .quote-block {
+            background: var(--surface);
+            border-left: 3px solid var(--accent);
+            padding: 18px 24px; border-radius: 0 10px 10px 0;
+            max-width: 580px; margin: 14px 0;
+        }
+        .quote-block p {
+            font-size: 1.05rem; font-style: italic;
+            color: var(--text); line-height: 1.6;
+        }
+        .quote-block cite {
+            display: block; margin-top: 6px;
+            font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+        }
+        .progress {
+            position: fixed; top: 0; left: 0;
+            height: 2px; background: var(--accent);
+            transition: width 0.3s ease; z-index: 200;
+        }
+        .tap-zone {
+            position: fixed; top: 0; width: 35%; height: 100%;
+            z-index: 50; cursor: pointer;
+        }
+        .tap-left { left: 0; }
+        .tap-right { right: 0; }
+        .key-hint {
+            position: fixed; top: 14px; right: 18px;
+            font-family: var(--mono); font-size: 0.68rem;
+            color: var(--muted); z-index: 100; letter-spacing: 0.08em;
+        }
+        kbd {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 3px; padding: 1px 5px;
+            font-family: var(--mono); font-size: 0.68rem; color: var(--muted);
+        }
+        .ext-link {
+            color: var(--accent2);
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            text-decoration: underline;
+        }
+        @media (max-width: 650px) {
+            .slide { padding: 24px 16px 45px; }
+            .two-col, .pro-con { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-
 <div class="progress" id="progress"></div>
+<div class="key-hint"><kbd>←</kbd> <kbd>→</kbd> navigieren</div>
 
 <div class="slides" id="slides">
 
-  <!-- SLIDE 1: Titel -->
-  <section class="slide active" id="s1">
-    <div class="kicker">Referat · Politik</div>
-    <div style="display:inline-block; width:fit-content; background:#ff6b2b; border-radius:12px; padding:10px 20px; margin-bottom:28px;">
-      <img src="piraten.jpeg" alt="Piratenpartei Deutschland" style="width: clamp(180px, 25vw, 300px); height: auto; display: block;">
-    </div>
-
-    <h1>Die Piraten-<br><span class="accent-line">partei</span></h1>
-    <p class="subtitle">Gegründet 2006 · Netzpolitik · Basisdemokratie</p>
-    <div style="margin-top:28px; display:flex; gap:12px; align-items:center;">
-      <div style="background:var(--surface); border:1px solid var(--border); border-radius:100px; padding:8px 20px; font-family:var(--mono); font-size:0.85rem; color:var(--accent);">Lea</div>
-      <span style="font-family:var(--mono); font-size:0.8rem; color:var(--muted);">&amp;</span>
-      <div style="background:var(--surface); border:1px solid var(--border); border-radius:100px; padding:8px 20px; font-family:var(--mono); font-size:0.85rem; color:var(--accent);">Nils</div>
-      <span style="font-family:var(--mono); font-size:0.75rem; color:var(--muted); margin-left:4px;">· Klasse 10a</span>
-    </div>
-  </section>
-
-  <!-- SLIDE 2: Überblick -->
-  <section class="slide" id="s2">
-    <div class="slide-header">
-      <span class="slide-num">01</span>
-      <span class="slide-label">Überblick</span>
-    </div>
-    <h2>Was sind die<br><span class="accent-line">Piraten?</span></h2>
-    <div style="display:inline-block; width:fit-content; background:#ff6b2b; border-radius:8px; padding:6px 14px; margin-bottom:20px;">
-      <img src="piraten.jpeg" alt="Piratenpartei Deutschland" style="width:180px; height:auto; display:block;">
-    </div>
-    <div class="stats">
-      <div class="stat">
-        <span class="stat-num">2006</span>
-        <span class="stat-label">Gründung (SE)</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">2006</span>
-        <span class="stat-label">Deutschland</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">35.000+</span>
-        <span class="stat-label">Mitglieder (2012)</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">~50</span>
-        <span class="stat-label">Länder weltweit</span>
-      </div>
-    </div>
-    <p class="big-text">Die Piratenpartei entstand aus der Bewegung gegen Urheberrechts­verfolgung im Internet. Rick Falkvinge gründete sie in Schweden — kurz danach folgte Deutschland. Ihr Fokus: <strong style="color:var(--accent2)">digitale Bürgerrechte, Transparenz und Demokratie im Netz.</strong></p>
-  </section>
-
-  <!-- SLIDE 3: Geschichte -->
-  <section class="slide" id="s3">
-    <div class="slide-header">
-      <span class="slide-num">02</span>
-      <span class="slide-label">Geschichte</span>
-    </div>
-    <h2>Aufstieg &amp;<br><span class="accent-line">Niedergang</span></h2>
-    <div class="timeline">
-      <div class="tl-item">
-        <span class="tl-year">2006</span>
-        <div class="tl-line"></div>
-        <div class="tl-content"><strong>Gründung in Deutschland</strong><span>Kleine Nischenpartei, kaum Resonanz</span></div>
-      </div>
-      <div class="tl-item">
-        <span class="tl-year">2009</span>
-        <div class="tl-line"></div>
-        <div class="tl-content"><strong>Bundestagswahl: 2,0 %</strong><span>Kein Einzug, aber starkes Ergebnis für Neupartei</span></div>
-      </div>
-      <div class="tl-item">
-        <span class="tl-year">2011</span>
-        <div class="tl-line"></div>
-        <div class="tl-content"><strong>Durchbruch: Berlin 8,9 %</strong><span>Einzug in vier Landtage binnen einem Jahr</span></div>
-      </div>
-      <div class="tl-item">
-        <span class="tl-year">2012</span>
-        <div class="tl-line"></div>
-        <div class="tl-content"><strong>Höchststand: ~35.000 Mitglieder</strong><span>Medienrummel, „Piraten-Hype"</span></div>
-      </div>
-      <div class="tl-item">
-        <span class="tl-year">2013</span>
-        <div class="tl-line"></div>
-        <div class="tl-content"><strong>Bundestagswahl: 2,2 % — gescheitert</strong><span>5-%-Hürde verfehlt, Absturz beginnt</span></div>
-      </div>
-      <div class="tl-item">
-        <span class="tl-year">Heute</span>
-        <div class="tl-line"></div>
-        <div class="tl-content"><strong>Bedeutungslos im Bundestag</strong><span>Themen leben weiter — in anderen Parteien</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 4: Themen -->
-  <section class="slide" id="s4">
-    <div class="slide-header">
-      <span class="slide-num">03</span>
-      <span class="slide-label">Kernthemen</span>
-    </div>
-    <h2>Was wollen die<br><span class="accent-line">Piraten?</span></h2>
-    <div class="tags">
-      <span class="tag big">Netzneutralität</span>
-      <span class="tag big">Datenschutz</span>
-      <span class="tag big">Informationsfreiheit</span>
-      <span class="tag">Urheberrechtsreform</span>
-      <span class="tag">Transparenz</span>
-      <span class="tag">Liquid Democracy</span>
-      <span class="tag">Grundeinkommen</span>
-      <span class="tag">Offener Quellcode</span>
-    </div>
-    <div class="cards">
-      <div class="card">
-        <span class="card-icon">🔒</span>
-        <h3>Datenschutz</h3>
-        <p>Gegen Vorratsdatenspeicherung. Staatliche Überwachung einschränken. Privatsphäre als Grundrecht.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">⚖️</span>
-        <h3>Urheberrecht</h3>
-        <p>Privates Teilen von Dateien soll erlaubt sein. Kulturelles Erbe frei zugänglich machen.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🌐</span>
-        <h3>Netzneutralität</h3>
-        <p>Alle Datenpakete gleich behandeln. Keine Zwei-Klassen-Gesellschaft im Internet.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🗳️</span>
-        <h3>Liquid Democracy</h3>
-        <p>Stimme direkt abgeben oder an Experten delegieren. Mehr direkte Demokratie.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 5: Besonderheiten -->
-  <section class="slide" id="s5">
-    <div class="slide-header">
-      <span class="slide-num">04</span>
-      <span class="slide-label">Besonderheiten</span>
-    </div>
-    <h2>Was macht sie<br><span class="accent-line">anders?</span></h2>
-    <div class="two-col">
-      <div class="col-block">
-        <h3>Digitale Werkzeuge</h3>
-        <ul>
-          <li><strong>Liquid Feedback</strong> — Abstimmungsplattform für Mitglieder</li>
-          <li><strong>Piratenpad</strong> — kollaboratives Schreiben in Echtzeit</li>
-          <li>Anträge online stellen &amp; diskutieren</li>
-          <li>Transparenz aller parteiinternen Vorgänge</li>
-        </ul>
-      </div>
-      <div class="col-block">
-        <h3>Parteistruktur</h3>
-        <ul>
-          <li>Flache Hierarchie, kaum Parteiführung</li>
-          <li>Offene Mitgliedschaft ohne Hürden</li>
-          <li>Basisdemokratisch: jeder entscheidet mit</li>
-          <li>Prinzip: mehr Schwarmintelligenz, weniger Elite</li>
-        </ul>
-      </div>
-    </div>
-    <div style="margin-top:24px;">
-      <p class="big-text">→ <strong style="color:var(--accent2)">Liquid Democracy</strong>: Du kannst bei Abstimmungen direkt abstimmen <em>oder</em> deine Stimme an jemanden delegieren, dem du vertraust — und jederzeit zurückziehen.</p>
-    </div>
-  </section>
-
-  <!-- SLIDE 6: Liquid Democracy vertieft -->
-  <section class="slide" id="s6">
-    <div class="slide-header">
-      <span class="slide-num">05</span>
-      <span class="slide-label">Liquid Democracy</span>
-    </div>
-    <h2>Demokratie<br><span class="accent-line">neu gedacht</span></h2>
-    <div class="liquid-demo">
-      <p style="font-size:0.85rem; color:var(--muted); font-family:var(--mono); margin-bottom:18px; letter-spacing:0.05em;">BEISPIEL: Abstimmung über Netzpolitik-Gesetz</p>
-      <div class="ld-row">
-        <div class="ld-person">
-          <div class="ld-avatar">👤</div>
-          <span class="ld-name">Anna</span>
-          <span class="ld-label">stimmt selbst</span>
+    <!-- S1: Titel -->
+    <section class="slide active" id="s1">
+        <div class="kicker" style="font-family:var(--mono);font-size:0.8rem;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <span style="width:28px;height:1px;background:var(--accent);"></span>Referat · Politik
         </div>
-        <div style="flex:1; height:1px; background:var(--border);"></div>
-        <div class="ld-person">
-          <div class="ld-avatar">✅</div>
-          <span class="ld-name">JA</span>
+        <div style="display:inline-block;width:fit-content;background:#ff6b2b;border-radius:12px;padding:8px 18px;margin-bottom:22px;">
+            <img src="piraten.jpeg" alt="Piratenpartei Logo" style="width:clamp(150px,20vw,260px);height:auto;display:block;">
         </div>
-      </div>
-      <div class="ld-row">
-        <div class="ld-person">
-          <div class="ld-avatar">👤</div>
-          <span class="ld-name">Ben</span>
-          <span class="ld-label">delegiert</span>
+        <h1>Die Piraten-<br><span class="accent-line">partei</span></h1>
+        <p class="subtitle" style="font-size:clamp(0.9rem,1.4vw,1.1rem);color:var(--muted);margin-top:14px;font-family:var(--mono);letter-spacing:0.05em;">Gegründet 2006 · Netzpolitik · Basisdemokratie</p>
+        <div style="margin-top:22px;display:flex;gap:10px;align-items:center;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 18px;font-family:var(--mono);font-size:0.8rem;color:var(--accent);">Lea</div>
+            <span style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);">&amp;</span>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 18px;font-family:var(--mono);font-size:0.8rem;color:var(--accent);">Nils</div>
+            <span style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-left:4px;">· Klasse 10a</span>
         </div>
-        <div class="ld-arrow"></div>
-        <div class="ld-person">
-          <div class="ld-avatar expert">🎓</div>
-          <span class="ld-name">IT-Experte</span>
-          <span class="ld-label">stimmt für Ben</span>
+    </section>
+
+    <!-- S2: Überblick + Gründungsfoto -->
+    <section class="slide" id="s2">
+        <div class="slide-header"><span class="slide-num">01</span><span class="slide-label">Überblick</span></div>
+        <h2>Was sind die<br><span class="accent-line">Piraten?</span></h2>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+            <div style="flex:1; min-width:220px;">
+                <div class="stats">
+                    <div class="stat"><span class="stat-num">2006</span><span class="stat-label">Gründung (SE)</span></div>
+                    <div class="stat"><span class="stat-num">2006</span><span class="stat-label">Deutschland</span></div>
+                    <div class="stat"><span class="stat-num">~35.000</span><span class="stat-label">Mitglieder (2012)</span></div>
+                    <div class="stat"><span class="stat-num">~50</span><span class="stat-label">Länder weltweit</span></div>
+                </div>
+                <p class="big-text">Die Piratenpartei entstand aus der Bewegung gegen Urheberrechtsverfolgung. Rick Falkvinge gründete sie in Schweden – kurz danach folgte Deutschland. Im Fokus: <strong style="color:var(--accent2)">digitale Bürgerrechte, Transparenz und Demokratie im Netz.</strong></p>
+            </div>
+            <div style="max-width:260px;">
+                <img src="https://piratenpartei.de/wp-content/uploads/2012/02/parteigeschichte_20060914_29.jpg" alt="Gründung der Piratenpartei 2006" style="width:100%; height:auto; border-radius:10px; border:1px solid var(--border);">
+                <p style="font-size:0.65rem; color:var(--muted); text-align:center; margin-top:4px;">Gründungsversammlung 2006</p>
+            </div>
         </div>
-      </div>
-      <div class="ld-row" style="margin-bottom:0">
-        <div class="ld-person">
-          <div class="ld-avatar">👤</div>
-          <span class="ld-name">Clara</span>
-          <span class="ld-label">delegiert</span>
+    </section>
+
+    <!-- S3: Geschichte -->
+    <section class="slide" id="s3">
+        <div class="slide-header"><span class="slide-num">02</span><span class="slide-label">Geschichte</span></div>
+        <h2>Aufstieg &amp;<br><span class="accent-line">Niedergang</span></h2>
+        <div class="timeline">
+            <div class="tl-item"><span class="tl-year">2006</span><div class="tl-line"></div><div class="tl-content"><strong>Gründung in Deutschland</strong><span>Nischenpartei, zunächst kaum Resonanz</span></div></div>
+            <div class="tl-item"><span class="tl-year">2009</span><div class="tl-line"></div><div class="tl-content"><strong>Bundestagswahl: 2,0 %</strong><span>Achtungserfolg für eine neue Partei</span></div></div>
+            <div class="tl-item"><span class="tl-year">2011</span><div class="tl-line"></div><div class="tl-content"><strong>Berlin 8,9 %</strong><span>Einzug in vier Landtage binnen eines Jahres</span></div></div>
+            <div class="tl-item"><span class="tl-year">2012</span><div class="tl-line"></div><div class="tl-content"><strong>~35.000 Mitglieder (Höchststand)</strong><span>Medienrummel, „Piraten-Hype"</span></div></div>
+            <div class="tl-item"><span class="tl-year">2013</span><div class="tl-line"></div><div class="tl-content"><strong>Bundestagswahl: 2,2 % – gescheitert</strong><span>5-%-Hürde verfehlt, rascher Absturz</span></div></div>
+            <div class="tl-item"><span class="tl-year">Heute</span><div class="tl-line"></div><div class="tl-content"><strong>Ohne Mandate im Bundestag</strong><span>Themen leben weiter – in anderen Parteien</span></div></div>
         </div>
-        <div class="ld-arrow"></div>
-        <div class="ld-person">
-          <div class="ld-avatar expert">🎓</div>
-          <span class="ld-name">IT-Experte</span>
-          <span class="ld-label">3 Stimmen total</span>
+    </section>
+
+    <!-- S4: Themen -->
+    <section class="slide" id="s4">
+        <div class="slide-header"><span class="slide-num">03</span><span class="slide-label">Kernthemen</span></div>
+        <h2>Was wollen die<br><span class="accent-line">Piraten?</span></h2>
+        <div class="tags">
+            <span class="tag big">Netzneutralität</span>
+            <span class="tag big">Datenschutz</span>
+            <span class="tag big">Informationsfreiheit</span>
+            <span class="tag">Urheberrechtsreform</span>
+            <span class="tag">Transparenz</span>
+            <span class="tag">Liquid Democracy</span>
+            <span class="tag">Grundeinkommen</span>
+            <span class="tag">Open Source</span>
         </div>
-      </div>
-    </div>
-    <p class="big-text">Delegation ist jederzeit widerrufbar. Wer sich auskennt, bekommt mehr Gewicht — wer will, stimmt direkt. <strong style="color:var(--accent2)">Mischung aus direkter und repräsentativer Demokratie.</strong></p>
-  </section>
+        <div class="cards">
+            <div class="card"><span class="card-icon">🔒</span><h3>Datenschutz</h3><p>Gegen Vorratsdatenspeicherung. Überwachung einschränken. Privatsphäre als Grundrecht.</p></div>
+            <div class="card"><span class="card-icon">⚖️</span><h3>Urheberrecht</h3><p>Privates Teilen von Dateien entkriminalisieren. Kulturelles Erbe frei zugänglich.</p></div>
+            <div class="card"><span class="card-icon">🌐</span><h3>Netzneutralität</h3><p>Alle Datenpakete gleich behandeln. Keine Zwei-Klassen-Gesellschaft im Internet.</p></div>
+            <div class="card"><span class="card-icon">🗳️</span><h3>Liquid Democracy</h3><p>Direkt abstimmen oder Stimme delegieren. Mehr direkte Demokratie wagen.</p></div>
+        </div>
+    </section>
 
-  <!-- SLIDE 7: International -->
-  <section class="slide" id="s7">
-    <div class="slide-header">
-      <span class="slide-num">06</span>
-      <span class="slide-label">International</span>
-    </div>
-    <h2>Eine globale<br><span class="accent-line">Bewegung</span></h2>
-    <div class="world-grid">
-      <div class="world-card">
-        <span class="flag">🇸🇪</span>
-        <h3>Schweden</h3>
-        <p>Ursprungsland. 2009 EU-Parlament-Einzug mit 7,1 %. Rick Falkvinge als Gründer.</p>
-      </div>
-      <div class="world-card">
-        <span class="flag">🇩🇪</span>
-        <h3>Deutschland</h3>
-        <p>Stärkste nationale Sektion. 2012 Hochpunkt mit 4 Landtagen und 35.000 Mitgliedern.</p>
-      </div>
-      <div class="world-card">
-        <span class="flag">🇮🇸</span>
-        <h3>Island</h3>
-        <p>Heute noch aktiv und relevant. 2016: 14,5 % bei Parlamentswahl — drittgrößte Partei.</p>
-      </div>
-      <div class="world-card">
-        <span class="flag">🇨🇿</span>
-        <h3>Tschechien</h3>
-        <p>Stärkste europäische Sektion heute. 2021: Teil der Regierungskoalition mit 15,6 %.</p>
-      </div>
-      <div class="world-card">
-        <span class="flag">🌍</span>
-        <h3>~50 Länder</h3>
-        <p>Pirate Parties International (PPI) koordiniert weltweit. Von Brasilien bis Australien.</p>
-      </div>
-      <div class="world-card">
-        <span class="flag">🇪🇺</span>
-        <h3>EU-Parlament</h3>
-        <p>Mehrere Mandate über die Jahre. Fokus auf Digitalpolitik und Bürgerrechte in Brüssel.</p>
-      </div>
-    </div>
-  </section>
+    <!-- S5: Besonderheiten -->
+    <section class="slide" id="s5">
+        <div class="slide-header"><span class="slide-num">04</span><span class="slide-label">Besonderheiten</span></div>
+        <h2>Was macht sie<br><span class="accent-line">anders?</span></h2>
+        <div class="two-col">
+            <div class="col-block">
+                <h3>Digitale Werkzeuge</h3>
+                <ul>
+                    <li><strong>Liquid Feedback</strong> – Abstimmungsplattform</li>
+                    <li><strong>Piratenpad</strong> – kollaboratives Schreiben</li>
+                    <li>Anträge online stellen &amp; diskutieren</li>
+                    <li>Transparenz aller parteiinternen Vorgänge</li>
+                </ul>
+            </div>
+            <div class="col-block">
+                <h3>Parteistruktur</h3>
+                <ul>
+                    <li>Flache Hierarchie, kaum Alleinherrscher</li>
+                    <li>Offene Mitgliedschaft ohne Hürden</li>
+                    <li>Basisdemokratisch: alle entscheiden mit</li>
+                    <li>Schwarmintelligenz statt Parteielite</li>
+                </ul>
+            </div>
+        </div>
+        <p class="big-text" style="margin-top:20px;">→ <strong style="color:var(--accent2)">Liquid Democracy</strong>: Du kannst bei jeder Abstimmung direkt abstimmen <em>oder</em> deine Stimme an eine vertraute Person delegieren – und jederzeit zurückziehen.</p>
+    </section>
 
-  <!-- SLIDE 8: Parteivorstand -->
-  <section class="slide" id="s8">
-    <div class="slide-header">
-      <span class="slide-num">07</span>
-      <span class="slide-label">Parteivorstand</span>
-    </div>
-    <h2>Wer führt die<br><span class="accent-line">Piraten?</span></h2>
-    <div class="cards" style="margin-bottom:20px;">
-      <div class="card">
-        <span class="card-icon">🧑‍✈️</span>
-        <h3>Vorsitzender</h3>
-        <p><strong style="color:var(--text)">Thomas Ganskow</strong><br>Bundesvorsitzender seit 2022. Langjähriges Mitglied, IT-Hintergrund.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🗂️</span>
-        <h3>Struktur</h3>
-        <p>Kleiner Bundesvorstand, bewusst flach gehalten. Keine „Partei-Elite" — Prinzip der Piraten.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🗳️</span>
-        <h3>Wahl</h3>
-        <p>Vorstand wird auf Bundesparteitagen gewählt. Jedes Mitglied kann kandidieren und abstimmen.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">📉</span>
-        <h3>Bedeutung heute</h3>
-        <p>Partei hat kaum noch Mandate. Vorstand verwaltet hauptsächlich die verbleibende Struktur.</p>
-      </div>
-    </div>
-    <p class="big-text" style="color:var(--muted); font-size:0.95rem;">Hinweis: Die Piraten hatten nie starke Einzelpersönlichkeiten — Programm und Basis standen immer über Personenkult.</p>
-  </section>
+    <!-- S6: Liquid Democracy vertieft -->
+    <section class="slide" id="s6">
+        <div class="slide-header"><span class="slide-num">05</span><span class="slide-label">Liquid Democracy</span></div>
+        <h2>Demokratie<br><span class="accent-line">neu gedacht</span></h2>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;">
+            <p style="font-size:0.8rem;color:var(--muted);font-family:var(--mono);margin-bottom:14px;">BEISPIEL: Abstimmung über ein Netzpolitik-Gesetz</p>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+                <div style="text-align:center;"><span>👤</span><br><span style="font-size:0.7rem;">Anna</span><br><span style="font-size:0.7rem;color:var(--accent2);">stimmt selbst</span></div>
+                <span>→</span><div style="text-align:center;"><span>✅</span><br><span style="font-size:0.7rem;">JA</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+                <div style="text-align:center;"><span>👤</span><br><span style="font-size:0.7rem;">Ben</span><br><span style="font-size:0.7rem;color:var(--accent2);">delegiert</span></div>
+                <span>→</span>
+                <div style="text-align:center;background:rgba(255,209,102,0.1);border-radius:8px;padding:6px;">
+                    <span>🎓</span><br><span style="font-size:0.7rem;">IT-Experte</span><br><span style="font-size:0.7rem;color:var(--accent2);">stimmt für Ben</span>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;">
+                <div style="text-align:center;"><span>👤</span><br><span style="font-size:0.7rem;">Clara</span><br><span style="font-size:0.7rem;color:var(--accent2);">delegiert</span></div>
+                <span>→</span>
+                <div style="text-align:center;background:rgba(255,209,102,0.1);border-radius:8px;padding:6px;">
+                    <span>🎓</span><br><span style="font-size:0.7rem;">IT-Experte</span><br><span style="font-size:0.7rem;color:var(--accent2);">3 Stimmen total</span>
+                </div>
+            </div>
+        </div>
+        <p class="big-text">Delegation ist jederzeit widerrufbar. Wer sich auskennt, bekommt mehr Gewicht – wer will, stimmt direkt. <strong style="color:var(--accent2)">Mischung aus direkter und repräsentativer Demokratie.</strong></p>
+    </section>
 
-  <!-- SLIDE 9: Parteiprogramm -->
-  <section class="slide" id="s9">
-    <div class="slide-header">
-      <span class="slide-num">08</span>
-      <span class="slide-label">Parteiprogramm</span>
-    </div>
-    <h2>Aktuelles<br><span class="accent-line">Programm</span></h2>
-    <div class="two-col">
-      <div class="col-block">
-        <h3>Kernforderungen (heute)</h3>
-        <ul>
-          <li>Freier Zugang zu Wissen &amp; Bildung</li>
-          <li>Abschaffung der Vorratsdatenspeicherung</li>
-          <li>Bedingungsloses Grundeinkommen (BGE)</li>
-          <li>Reform des Urheberrechts zugunsten der Nutzer</li>
-          <li>Transparenz staatlichen Handelns</li>
-          <li>Digitalisierung der Verwaltung</li>
-        </ul>
-      </div>
-      <div class="col-block">
-        <h3>Gesellschaftspolitik</h3>
-        <ul>
-          <li>Legalisierung von Cannabis (bereits umgesetzt!)</li>
-          <li>Gleichstellung aller Geschlechter &amp; Lebensformen</li>
-          <li>Trennung von Kirche und Staat</li>
-          <li>Offene Einwanderungspolitik</li>
-          <li>Direkte Demokratie durch Volksabstimmungen</li>
-        </ul>
-      </div>
-    </div>
-    <div style="margin-top:20px; background:rgba(255,209,102,0.07); border:1px solid rgba(255,209,102,0.2); border-radius:10px; padding:14px 20px;">
-      <p style="font-size:0.88rem; color:rgba(232,230,223,0.8);">💡 Viele Forderungen wurden inzwischen von anderen Parteien übernommen — z. B. Cannabis-Legalisierung (SPD/Grüne) und Datenschutz-Grundverordnung (DSGVO).</p>
-    </div>
-  </section>
+    <!-- S7: International (inkl. PPI) -->
+    <section class="slide" id="s7">
+        <div class="slide-header"><span class="slide-num">06</span><span class="slide-label">International</span></div>
+        <h2>Eine globale<br><span class="accent-line">Bewegung</span></h2>
+        <div class="world-grid">
+            <div class="world-card"><span class="flag">🇸🇪</span><h3>Schweden</h3><p>Ursprungsland. 2009 EU-Parlament mit 7,1 %. Rick Falkvinge als Gründer.</p></div>
+            <div class="world-card"><span class="flag">🇩🇪</span><h3>Deutschland</h3><p>Stärkste nationale Sektion. 2012 vier Landtage und 35.000 Mitglieder.</p></div>
+            <div class="world-card"><span class="flag">🇮🇸</span><h3>Island</h3><p>Heute noch relevant. 2016: 14,5 % – drittgrößte Partei.</p></div>
+            <div class="world-card"><span class="flag">🇨🇿</span><h3>Tschechien</h3><p>Stärkste europäische Sektion. 2021 mit 15,6 % an der Regierung beteiligt.</p></div>
+            <div class="world-card"><span class="flag">🌍</span><h3>~50 Länder</h3><p><strong>Pirate Parties International (PPI)</strong> koordiniert weltweit. Von Brasilien bis Australien.</p></div>
+            <div class="world-card"><span class="flag">🇪🇺</span><h3>EU-Parlament</h3><p>Mehrere Mandate über die Jahre. Fokus auf Digitalpolitik und Bürgerrechte.</p></div>
+        </div>
+        <p style="font-size:0.75rem;color:var(--muted);margin-top:12px;">🌐 Pirate Parties International (PPI) – Dachverband mit Sitz in Brüssel, gegründet 2010.</p>
+    </section>
 
-  <!-- SLIDE 10: Aktuelle Politik -->
-  <section class="slide" id="s10">
-    <div class="slide-header">
-      <span class="slide-num">09</span>
-      <span class="slide-label">Aktuelle Politik</span>
-    </div>
-    <h2>Piraten heute —<br><span class="accent-line">Bund &amp; Land</span></h2>
-    <div class="cards">
-      <div class="card">
-        <span class="card-icon">🏛️</span>
-        <h3>Bund</h3>
-        <p>Kein Bundestagsmandat seit 2013. Kandidieren weiterhin, aber unter 1 %. Kaum Einfluss auf Bundesebene.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🗺️</span>
-        <h3>Land</h3>
-        <p>Keine Landtagsmandate mehr in Deutschland. Letzter Einzug: Saarland 2012. Seither aus allen Landtagen geflogen.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🇪🇺</span>
-        <h3>Europa</h3>
-        <p>Aktiv im EU-Parlament über Partnerparteien. Tschechische Piraten stellten 2021 Ministerposten in der Regierung.</p>
-      </div>
-      <div class="card">
-        <span class="card-icon">🌐</span>
-        <h3>Digital-Agenda</h3>
-        <p>Themen wie KI-Regulierung, Chatkontrolle und Datenschutz treiben Piraten weiter an — auch ohne Mandate.</p>
-      </div>
-    </div>
-    <div style="margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 20px;">
-      <p style="font-size:0.88rem; color:rgba(232,230,223,0.75);">📍 <strong style="color:var(--accent2)">Bayern:</strong> Piraten traten zuletzt 2023 zur Landtagswahl an — Ergebnis unter 0,5 %. Kein Einzug in den Bayerischen Landtag.</p>
-    </div>
-  </section>
+    <!-- S8: Politische Aktivitäten -->
+    <section class="slide" id="s8">
+        <div class="slide-header"><span class="slide-num">07</span><span class="slide-label">Aktivitäten</span></div>
+        <h2>Was die Piraten<br><span class="accent-line">politisch bewegt haben</span></h2>
+        <div class="timeline">
+            <div class="tl-item"><span class="tl-year">2009</span><div class="tl-line"></div><div class="tl-content"><strong>Klage gegen Vorratsdatenspeicherung</strong><span>Gemeinsam mit Bürgerrechtlern; später vom BVerfG teilweise gekippt</span></div></div>
+            <div class="tl-item"><span class="tl-year">2011</span><div class="tl-line"></div><div class="tl-content"><strong>Volksbegehren „Transparenz Hamburg"</strong><span>Über 100.000 Unterschriften für gläserne Verwaltung</span></div></div>
+            <div class="tl-item"><span class="tl-year">2013</span><div class="tl-line"></div><div class="tl-content"><strong>Snowden-Affäre: Klage gegen BND</strong><span>Herausgabe von NSA-Verträgen erwirkt</span></div></div>
+            <div class="tl-item"><span class="tl-year">2015</span><div class="tl-line"></div><div class="tl-content"><strong>Netzpolitisches Bündnis</strong><span>Mit CCC und Digitalcourage gegen Netzsperren</span></div></div>
+            <div class="tl-item"><span class="tl-year">2019</span><div class="tl-line"></div><div class="tl-content"><strong>Demo gegen Uploadfilter (Art. 13)</strong><span>Massenmobilisierung, Piraten an vorderster Front</span></div></div>
+            <div class="tl-item"><span class="tl-year">2024</span><div class="tl-line"></div><div class="tl-content"><strong>Kampagne #StopScanning (Chatkontrolle)</strong><span>Europäische Initiative, Piraten Deutschland + Tschechien aktiv</span></div></div>
+        </div>
+    </section>
 
-  <!-- SLIDE 11: Kontroversen -->
-  <section class="slide" id="s11">
-    <div class="slide-header">
-      <span class="slide-num">10</span>
-      <span class="slide-label">Kontroversen</span>
-    </div>
-    <h2>Skandale &amp;<br><span class="accent-line">Streitpunkte</span></h2>
-    <div class="pro-con">
-      <div class="con-block" style="border-color:rgba(255,107,43,0.3);">
-        <h3>⚡ Interne Konflikte</h3>
-        <ul>
-          <li><strong style="color:var(--text)">„Shitstorms" intern:</strong> Öffentliche Twitter-Streitigkeiten zwischen Mitgliedern schadeten dem Image massiv</li>
-          <li><strong style="color:var(--text)">Sexismusvorwürfe:</strong> 2012 Diskussion über frauenfeindliche Kommentare in Piratenforen</li>
-          <li><strong style="color:var(--text)">Führungslosigkeit:</strong> Häufige Rücktritte im Vorstand, kein stabiles Führungsteam</li>
-          <li><strong style="color:var(--text)">Liquid Feedback scheiterte:</strong> Nur wenige Mitglieder nutzten die Plattform aktiv</li>
-        </ul>
-      </div>
-      <div class="con-block" style="border-color:rgba(200,100,220,0.3);">
-        <h3>🔥 Gesellschaftliche Debatten</h3>
-        <ul>
-          <li><strong style="color:var(--text)">Urheberrecht:</strong> Vorwurf, sie würden geistiges Eigentum von Künstlern nicht schützen wollen</li>
-          <li><strong style="color:var(--text)">Chatkontrolle (EU):</strong> Piraten kämpfen dagegen — Gegner nennen es Notwendigkeit gegen Kindesmissbrauch</li>
-          <li><strong style="color:var(--text)">Grundeinkommen:</strong> Zu teuer? Oder Zukunftsmodell? Stark umstritten</li>
-          <li><strong style="color:var(--text)">Überwachung vs. Sicherheit:</strong> Wie viel Datenschutz ist zu viel?</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+    <!-- S9: Vorsitz (mit Bild) -->
+    <section class="slide" id="s9">
+        <div class="slide-header"><span class="slide-num">08</span><span class="slide-label">Parteivorstand</span></div>
+        <h2>Wer führt die<br><span class="accent-line">Piraten?</span></h2>
+        <div class="cards">
+            <div class="card" style="display:flex;flex-direction:column;align-items:flex-start;">
+                <img src="ganskow.jpg" alt="Thomas Ganskow" onerror="this.style.display='none'" style="width:65px;height:65px;border-radius:50%;object-fit:cover;margin-bottom:10px;border:2px solid var(--accent);">
+                <span class="card-icon">🧑‍✈️</span>
+                <h3>Vorsitzender</h3>
+                <p><strong style="color:var(--text)">Thomas Ganskow</strong><br>Bundesvorsitzender seit 2022. IT-Fachmann, ehemals NRW-Vorstand.</p>
+            </div>
+            <div class="card"><span class="card-icon">🗂️</span><h3>Struktur</h3><p>Kleiner Bundesvorstand, bewusst flach. Keine „Parteielite" – Prinzip der Piraten.</p></div>
+            <div class="card"><span class="card-icon">🗳️</span><h3>Wahl</h3><p>Der Vorstand wird auf Bundesparteitagen gewählt. Jedes Mitglied kann kandidieren.</p></div>
+            <div class="card"><span class="card-icon">📉</span><h3>Bedeutung heute</h3><p>Partei hat kaum noch Mandate. Vorstand verwaltet hauptsächlich die verbleibende Struktur.</p></div>
+        </div>
+        <p style="color:var(--muted);font-size:0.84rem;margin-top:10px;">Hinweis: Die Piraten hatten nie starke Einzelpersönlichkeiten – Programm und Basis standen immer über Personenkult.</p>
+    </section>
 
-  <!-- SLIDE 12: Fazit -->
-  <section class="slide" id="s12">
-    <div class="slide-header" style="justify-content:center;">
-      <span class="slide-num">11</span>
-      <span class="slide-label">Fazit</span>
-    </div>
-    <h2 style="text-align:center;">Die Debatte gewonnen,<br><span class="accent-line">die Partei verloren</span></h2>
-    <div class="quote-block">
-      <p>„Die Piraten haben als erste Partei in Deutschland erkannt, dass das Internet keine technische Frage ist — sondern eine politische."</p>
-      <cite>— Häufige Einschätzung in der Politikwissenschaft</cite>
-    </div>
-    <div class="tags" style="justify-content:center; margin-top:20px;">
-      <span class="tag">DSGVO 2018</span>
-      <span class="tag">Netzsperren-Debatte</span>
-      <span class="tag">Digitalausschuss im Bundestag</span>
-      <span class="tag">Open-Data-Gesetze</span>
-    </div>
-    <p style="color:var(--muted); font-family:var(--mono); font-size:0.85rem; margin-top:16px; letter-spacing:0.05em;">Alle obigen Themen: ursprünglich von den Piraten auf die Agenda gesetzt 🏴‍☠️</p>
-  </section>
+    <!-- S10: Bund & Länder detailliert -->
+    <section class="slide" id="s10">
+        <div class="slide-header"><span class="slide-num">09</span><span class="slide-label">Standorte</span></div>
+        <h2>Piraten in<br><span class="accent-line">den Ländern</span></h2>
+        <div class="world-grid">
+            <div class="world-card"><span class="flag">🏙️</span><h3>Berlin</h3><p>Kein Mandat mehr. Vereinzelte Bezirksverordnete bis 2023. Mitglieder ~250.</p></div>
+            <div class="world-card"><span class="flag">🌊</span><h3>Nordrhein-Westfalen</h3><p>Größter Landesverband. Aktiv in Kommunalpolitik, z. B. Köln und Bonn.</p></div>
+            <div class="world-card"><span class="flag">🏔️</span><h3>Bayern</h3><p>Nur noch rudimentär aktiv. Kein Landtagsmandat, kaum kommunale Sitze.</p></div>
+            <div class="world-card"><span class="flag">⚓</span><h3>Schleswig-Holstein</h3><p>Historisch stark, heute kleine aktive Basis. Kaum noch kommunale Mandate.</p></div>
+            <div class="world-card"><span class="flag">🌳</span><h3>Baden-Württemberg</h3><p>Einige Kreisverbände, Fokus auf Digitalpolitik. Keine Landtagsmandate.</p></div>
+            <div class="world-card"><span class="flag">🧭</span><h3>Übrige Länder</h3><p>In vielen Ländern nur noch Karteileichen. Hauptaktivität online oder in Großstädten.</p></div>
+        </div>
+        <p style="margin-top:14px;font-size:0.82rem;color:var(--muted);">📍 <strong style="color:var(--accent2);">Bundesebene:</strong> Kein Bundestagsmandat seit 2013. Wahlergebnisse zuletzt unter 1 %. Dennoch weiterhin Kandidaturen.</p>
+    </section>
+
+    <!-- S11: Parteiprogramm (erweitert) -->
+    <section class="slide" id="s11">
+        <div class="slide-header"><span class="slide-num">10</span><span class="slide-label">Parteiprogramm</span></div>
+        <h2>Aktuelles<br><span class="accent-line">Programm</span></h2>
+        <div class="two-col">
+            <div class="col-block">
+                <h3>Digitalisierung & Netzpolitik</h3>
+                <ul>
+                    <li>Open Data & E-Government verpflichtend</li>
+                    <li>Netzneutralität gesetzlich verankern</li>
+                    <li>Breitbandausbau als öffentliche Aufgabe</li>
+                    <li>Keine Netzsperren oder Uploadfilter</li>
+                </ul>
+                <h3 style="margin-top:16px;">Datenschutz & Bürgerrechte</h3>
+                <ul>
+                    <li>Abschaffung der Vorratsdatenspeicherung</li>
+                    <li>Recht auf anonyme Internetnutzung</li>
+                    <li>Staatstrojaner verbieten</li>
+                    <li>Versammlungsfreiheit digital schützen</li>
+                </ul>
+            </div>
+            <div class="col-block">
+                <h3>Urheberrecht & Bildung</h3>
+                <ul>
+                    <li>Urheberrecht an digitales Zeitalter anpassen</li>
+                    <li>Freie Lizenzen und Open Access fördern</li>
+                    <li>Freie Lehrmaterialien für alle</li>
+                    <li>Digitale Bildung als Pflichtfach</li>
+                </ul>
+                <h3 style="margin-top:16px;">Gesellschaft, Umwelt, Demokratie</h3>
+                <ul>
+                    <li>Bedingungsloses Grundeinkommen (BGE)</li>
+                    <li>Legalisierung von Cannabis (umgesetzt)</li>
+                    <li>Klimaschutz durch Green IT & Digitalisierung</li>
+                    <li>Liquid Democracy & Volksabstimmungen</li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);">📋 Quelle:</span>
+            <a href="https://wiki.piratenpartei.de/Parteiprogramm" target="_blank" rel="noopener" class="ext-link">wiki.piratenpartei.de/Parteiprogramm</a>
+        </div>
+    </section>
+
+    <!-- S12: Kontroversen (erweitert) -->
+    <section class="slide" id="s12">
+        <div class="slide-header"><span class="slide-num">11</span><span class="slide-label">Kontroversen</span></div>
+        <h2>Skandale &amp;<br><span class="accent-line">Streitpunkte</span></h2>
+        <div class="pro-con">
+            <div class="con-block" style="border-color:rgba(255,107,43,0.35);">
+                <h3>⚡ Interne Konflikte</h3>
+                <ul>
+                    <li><strong>Öffentliche Zerstrittenheit:</strong> Twitter-Streitereien schreckten Wähler ab (2012–2014)</li>
+                    <li><strong>Führungslosigkeit:</strong> Häufige Rücktritte, unklare Verantwortlichkeiten</li>
+                    <li><strong>Liquid Feedback kaum genutzt:</strong> Nur 5–10 % der Mitglieder stimmten aktiv ab</li>
+                </ul>
+            </div>
+            <div class="con-block" style="border-color:rgba(255,107,43,0.35);">
+                <h3>🚫 Gesellschaftliche Debatten</h3>
+                <ul>
+                    <li><strong>Sexismus-Vorwürfe:</strong> 2012 Debatte über frauenfeindliche Kommentare in Piratenforen, mangelnde Parität</li>
+                    <li><strong>Rassismus-Vorwürfe:</strong> Kritik an unscharfer Abgrenzung gegen rechte Trittbrettfahrer</li>
+                    <li><strong>AfD-Verhältnis:</strong> Unvereinbarkeitsbeschluss, aber vereinzelte Doppelmitgliedschaften empörten</li>
+                    <li><strong>Rechte Äußerungen:</strong> Ein Mitglied fiel 2016 mit islamfeindlichen Tweets auf; Ausschluss verzögert</li>
+                </ul>
+            </div>
+        </div>
+        <div class="quote-block" style="margin-top:16px;">
+            <p>„Die Piraten haben es versäumt, klare rote Linien gegen rechts zu ziehen, und dafür einen hohen Preis gezahlt."</p>
+            <cite>– Politikwissenschaftliche Einordnung (2017)</cite>
+        </div>
+    </section>
+
+    <!-- S13: Fazit -->
+    <section class="slide" id="s13">
+        <div class="slide-header" style="justify-content:center;"><span class="slide-num">12</span><span class="slide-label">Fazit</span></div>
+        <h2 style="text-align:center;">Die Debatte gewonnen,<br><span class="accent-line">die Partei verloren</span></h2>
+        <div class="quote-block" style="margin:18px auto;">
+            <p>„Die Piraten haben als erste Partei in Deutschland erkannt, dass das Internet keine technische Frage ist – sondern eine politische."</p>
+            <cite>– Häufige Einschätzung in der Politikwissenschaft</cite>
+        </div>
+        <div class="tags" style="justify-content:center;margin-top:14px;">
+            <span class="tag">DSGVO 2018</span>
+            <span class="tag">Netzsperren-Debatte</span>
+            <span class="tag">Digitalausschuss Bundestag</span>
+            <span class="tag">Open-Data-Gesetze</span>
+        </div>
+        <p style="color:var(--muted);font-family:var(--mono);font-size:0.78rem;margin-top:10px;text-align:center;">Alle obigen Themen: ursprünglich von den Piraten auf die Agenda gesetzt 🏴‍☠️</p>
+    </section>
 
 </div>
 
-<!-- Unsichtbare Tap-Zonen links/rechts -->
-<div onclick="go(cur-1)" style="position:fixed;left:0;top:0;width:35%;height:100%;z-index:50;cursor:pointer;"></div>
-<div onclick="go(cur+1)" style="position:fixed;right:0;top:0;width:35%;height:100%;z-index:50;cursor:pointer;"></div>
+<!-- Tap-Zonen -->
+<div class="tap-zone tap-left" onclick="go(cur-1)"></div>
+<div class="tap-zone tap-right" onclick="go(cur+1)"></div>
 
-<!-- Logo oben links -->
-<img src="logo.png" alt="Logo" onerror="this.style.display='none'"
-  style="position:fixed;top:14px;left:18px;width:30px;height:30px;object-fit:contain;border-radius:50%;z-index:100;opacity:0.65;">
-
-<!-- Dots zentriert unten, kein Kasten -->
-<div id="dots" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:100;"></div>
+<!-- Dots -->
+<div id="dots" style="position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:100;"></div>
 
 <script>
-  const slides = document.querySelectorAll('.slide');
-  const dotsEl = document.getElementById('dots');
-  const prog   = document.getElementById('progress');
-  let cur = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dotsEl = document.getElementById('dots');
+    const prog = document.getElementById('progress');
+    let cur = 0;
 
-  slides.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.onclick = (e) => { e.stopPropagation(); go(i); };
-    dotsEl.appendChild(d);
-  });
+    slides.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'dot';
+        d.style.width = '6px'; d.style.height = '6px';
+        d.style.borderRadius = '50%';
+        d.style.background = i === 0 ? 'var(--accent)' : 'var(--muted)';
+        d.style.cursor = 'pointer';
+        d.style.transition = 'background 0.2s, transform 0.2s';
+        d.onclick = (e) => { e.stopPropagation(); go(i); };
+        dotsEl.appendChild(d);
+    });
 
-  function go(n) {
-    slides[cur].classList.remove('active');
-    slides[cur].classList.add('exit');
-    const prev = cur;
-    cur = Math.max(0, Math.min(slides.length - 1, n));
-    slides[cur].classList.add('active');
-    setTimeout(() => slides[prev].classList.remove('exit'), 500);
-    document.querySelectorAll('.dot').forEach((d,i) =>
-      d.classList.toggle('active', i === cur));
-    prog.style.width = ((cur + 1) / slides.length * 100) + '%';
-  }
+    function go(n) {
+        slides[cur].classList.remove('active');
+        slides[cur].classList.add('exit');
+        const prev = cur;
+        cur = Math.max(0, Math.min(slides.length - 1, n));
+        slides[cur].classList.add('active');
+        setTimeout(() => slides[prev].classList.remove('exit'), 500);
+        const allDots = document.querySelectorAll('#dots div');
+        allDots.forEach((d, i) => {
+            d.style.background = i === cur ? 'var(--accent)' : 'var(--muted)';
+            d.style.transform = i === cur ? 'scale(1.3)' : 'scale(1)';
+        });
+        prog.style.width = ((cur + 1) / slides.length * 100) + '%';
+    }
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(cur - 1);
-  });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(cur - 1);
+    });
 
-  prog.style.width = (1 / slides.length * 100) + '%';
+    prog.style.width = (1 / slides.length * 100) + '%';
 </script>
 </body>
 </html>
